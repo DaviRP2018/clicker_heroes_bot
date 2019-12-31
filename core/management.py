@@ -1,5 +1,7 @@
 import sys
+
 from bot.main import Main
+from utils.utils import calibrate_colors, calibrate_positions
 
 
 class ManagementUtility:
@@ -13,18 +15,18 @@ class ManagementUtility:
         """
         Run given command-line arguments.
         """
-        bot = Main()
         try:
             subcommand = self.argv[1]
         except IndexError:
             subcommand = 'help'  # Display help if no arguments were given.
 
         if subcommand == "runbot":
+            bot = Main()
             bot.start_bot()
-        elif subcommand == "calibrate_colors":
-            bot.calibrate_colors()
-        elif subcommand == "calibrate_positions":
-            bot.calibrate_positions()
+        elif subcommand == "calibratecolors":
+            calibrate_colors()
+        elif subcommand == "calibratepositions":
+            calibrate_positions()
         else:
             sys.stdout.write("Command not found")
 

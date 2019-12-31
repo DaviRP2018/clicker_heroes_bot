@@ -8,19 +8,20 @@ import pyautogui
 
 from powers.models import Powers
 from settings.settings import *
+from utils.utils import (get_color, hire_all_relevant_heroes,
+                         set_auto_clicker_hire_hero,
+                         set_auto_clickers_to_damage, upgrade_all, reset_auto_clickers)
 
 POWERS = Powers.powers
 
 
 class Main(object):
     def __init__(self):
-        self.dc = windll.user32.GetDC(0)
         self.farm_mode = False
         self.farm_period_mark = time.time()
+        self.hire_last_hero_cooldown_mark = time.time()
 
-        self.farms_interval_mark = time.time()
         self.boss_fight_fails = 0
-
 
         print("Starting in 3 seconds...")
         time.sleep(3)
@@ -36,51 +37,20 @@ class Main(object):
         for i in range(1, 7):
             pyautogui.click(x=POWERS_POS[0], y=POWERS_POS[POWERS[i]["position"]])
 
-    def calibrate_colors(self):
-        """ Calibrate colors """
-        print('Press Ctrl-C to quit.')
-        dc = windll.user32.GetDC(0)
-        try:
-            while True:
-                x, y = pyautogui.position()
-                rgb = windll.gdi32.GetPixel(dc, x, y)
-                r = rgb & 0xff
-                g = (rgb >> 8) & 0xff
-                b = (rgb >> 16) & 0xff
-                a = (rgb >> 32) & 0xffff
-                color = "{} {} {} {}".format(r, g, b, a)
-                print(color, end='')
-                print('\b' * len(color), end='', flush=True)
-        except KeyboardInterrupt:
-            return
-
-
-    def calibrate_positions(self):
-        """ Calibrate positions """
-        print('Press Ctrl-C to quit.')
-        try:
-            while True:
-                x, y = pyautogui.position()
-                positionStr = 'X: ' + str(x).rjust(4) + ' Y: ' + str(y).rjust(4)
-                print(positionStr, end='')
-                print('\b' * len(positionStr), end='', flush=True)
-        except KeyboardInterrupt:
-            return
-
     def check_and_use_power(self, power_id, power_cooldown, energize_cooldown, reload_cooldown):
         power_name = POWERS[power_id]["name"]
         is_infinite = POWERS[power_id]["is_infinite"]
 
-        if power_cooldown < 0:
+        if power_cooldown <= 0:
             time.sleep(2)  # Garante que o poder esteja carregado por conta do lag no jogo
             print('Activated', power_name)
-            if (not is_infinite or not POWERS[power_id]["is_powered"]) and energize_cooldown < 0:
+            if (not is_infinite or not POWERS[power_id]["is_powered"]) and energize_cooldown <= 0:
                 print('Using Energize on', power_name)
                 pyautogui.click(x=POWERS_POS[0], y=POWERS_POS[8])  # Energize
                 POWERS[8]["cooldown_mark"] = time.time()
                 POWERS[power_id]["is_powered"] = True
             pyautogui.click(x=POWERS_POS[0], y=POWERS_POS[POWERS[power_id]["position"]])
-            if not is_infinite and reload_cooldown < 0:
+            if not is_infinite and reload_cooldown <= 0:
                 print('Using Reload on', power_name)
                 pyautogui.click(x=POWERS_POS[0], y=POWERS_POS[9])  # Reload
                 POWERS[9]["cooldown_mark"] = time.time()
@@ -141,14 +111,18 @@ class Main(object):
         pyautogui.keyUp("q")
         pyautogui.click(GILD_CLOSE_POS[0], GILD_CLOSE_POS[1])
 
+        # Hire relevant heroes
+        hire_all_relevant_heroes()
+        time.sleep(1)
+        upgrade_all()
+        time.sleep(1)
+
         # Put auto-clickers
-        pyautogui.keyDown("c")
-        for i in range(1, NUMBER_OF_AUTO_CLICKERS):
-            pyautogui.click(GOLD_PICKUP_POS[1], GOLD_PICKUP_POS[3])
-            time.sleep(1)
+        set_auto_clickers_to_damage()
         time.sleep(5)
-        pyautogui.click(HERO_TREEBEAST_POS[0], HERO_TREEBEAST_POS[1])
-        pyautogui.keyUp("c")
+        set_auto_clicker_hire_hero(HERO_TREEBEAST_POS)
+
+        # Reset as a new start
         self.__init__()
 
     def start_bot(self):
@@ -161,24 +135,35 @@ class Main(object):
                     cooldown_mark = time.time()
 
                     farm_period = FARM_PERIOD_VALUE - (cooldown_mark - self.farm_period_mark)
-                    rgb = windll.gdi32.GetPixel(self.dc, FARM_MODE_POS[0], FARM_MODE_POS[1])
-                    r = rgb & 0xff
+                    hire_last_hero_cooldown = HIRE_LAST_HERO_COOLDOWN_VALUE - (cooldown_mark - self.hire_last_hero_cooldown_mark)
+                    rgb = get_color(FARM_MODE_POS[0], FARM_MODE_POS[1])
+                    r = rgb[0]
                     if not self.farm_mode and r == 255:
-                        print("Farm mode enabled, waiting %is to disable" % FARM_PERIOD_VALUE)
-                        self.farm_mode = True
-                        self.farm_period_mark = time.time()
-                        if (cooldown_mark - self.farms_interval_mark) <= BOSS_FIGHT_FAIL_INTERVAL:
-                            self.boss_fight_fails += 1
-                            if self.boss_fight_fails >= BOSS_FIGHT_FAILS_LIMIT:
-                                print("Progress is not possible. Preparing to ascend")
-                                self.ascend()
-                            print("Progress stoped. Interval of {:.2f}s. Count: {}. {} consecutive fails remaining to ascend".format(
-                                cooldown_mark - self.farms_interval_mark, self.boss_fight_fails, BOSS_FIGHT_FAILS_LIMIT - self.boss_fight_fails
-                            ))
-                            self.farms_interval_mark = time.time()
+                        if hire_last_hero_cooldown <= 0:
+                            print("Progress stoped. Hiring last hero and assigning auto-clickers")
+                            reset_auto_clickers()
+                            time.sleep(1)
+                            set_auto_clickers_to_damage()
+                            time.sleep(1)
+                            set_auto_clicker_hire_hero(HERO_LAST_HIREABLE_POS)
+                            time.sleep(1)
                         else:
-                            self.boss_fight_fails = 0
-                    elif self.farm_mode and farm_period < 0:
+                            print("Farm mode enabled, waiting %is to disable" % FARM_PERIOD_VALUE)
+                            self.farm_mode = True
+                            if (cooldown_mark - self.farm_period_mark) <= BOSS_FIGHT_FAIL_INTERVAL:
+                                self.boss_fight_fails += 1
+                                if self.boss_fight_fails >= BOSS_FIGHT_FAILS_LIMIT:
+                                    print("Progress is not possible. Preparing to ascend")
+                                    self.ascend()
+                                print("Progress stoped. Interval of {:.2f}s. Count: {}. {} consecutive fails remaining to ascend".format(
+                                    cooldown_mark - self.farm_period_mark, self.boss_fight_fails, BOSS_FIGHT_FAILS_LIMIT - self.boss_fight_fails
+                                ))
+                                print("Upgrading all heroes")
+                                upgrade_all()
+                            else:
+                                self.boss_fight_fails = 0
+                            self.farm_period_mark = time.time()
+                    elif self.farm_mode and farm_period <= 0:
                         print("Farm mode disabled")
                         pyautogui.click(x=FARM_MODE_POS[0], y=FARM_MODE_POS[1])
                         self.farm_mode = False
@@ -213,7 +198,7 @@ class Main(object):
                     self.check_and_use_power(5, self.golden_clicks_cooldown, self.energize_cooldown, self.reload_cooldown)
                     self.check_and_use_power(6, self.super_clicks_cooldown, self.energize_cooldown, self.reload_cooldown)
 
-                    if self.dark_ritual_cooldown < 0 and self.reload_cooldown < 0:
+                    if self.dark_ritual_cooldown <= 0 and self.reload_cooldown <= 0:
                         time.sleep(5)  # Garante que o poder esteja carregado por conta do lag no jogo
                         pyautogui.click(x=POWERS_POS[0], y=POWERS_POS[POWERS[7]["position"]])
                         POWERS[7]["cooldown_mark"] = time.time()
