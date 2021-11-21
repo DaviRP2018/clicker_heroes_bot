@@ -1,13 +1,14 @@
 import sys
 
 from bot.main import Main
-from utils.utils import calibrate_colors, calibrate_positions
+from utils.utils import calibrate_colors, calibrate_positions, manual_calibrate_colors, manual_calibrate_positions
 
 
 class ManagementUtility:
     """
     Encapsulate the logic of the manage.py utilities.
     """
+
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
 
@@ -18,7 +19,7 @@ class ManagementUtility:
         try:
             subcommand = self.argv[1]
         except IndexError:
-            subcommand = 'help'  # Display help if no arguments were given.
+            subcommand = "help"  # Display help if no arguments were given.
 
         if subcommand == "runbot":
             bot = Main()
@@ -27,6 +28,11 @@ class ManagementUtility:
             calibrate_colors()
         elif subcommand == "calibratepositions":
             calibrate_positions()
+        elif subcommand == "mcc":
+            manual_calibrate_colors()
+        elif subcommand == "mcp":
+            manual_calibrate_positions()
+
         else:
             sys.stdout.write("Command not found")
 
