@@ -154,6 +154,12 @@ class Main(object):
         pyautogui.click(self.positions["farm_mode"][0], self.positions["farm_mode"][1])
         time.sleep(1)
 
+        pyautogui.click(
+            self.positions["gold_pickup"][2],
+            self.positions["gold_pickup"][0],
+        )
+        time.sleep(3)
+
         # Get new gilds and gild Treebeast
         pyautogui.click(self.positions["gild_new"][0], self.positions["gild_new"][1])
         time.sleep(2)
@@ -163,15 +169,15 @@ class Main(object):
             self.positions["gild_new_openall"][0], self.positions["gild_new_openall"][1]
         )
         time.sleep(2)
-        pyautogui.keyDown("q")
-        pyautogui.click(
-            self.positions["gild_treebeast"][0], self.positions["gild_treebeast"][1]
-        )
-        time.sleep(1)
-        pyautogui.keyUp("q")
-        pyautogui.click(
-            self.positions["gild_close"][0], self.positions["gild_close"][1]
-        )
+        # pyautogui.keyDown("q")
+        # pyautogui.click(
+        #     self.positions["gild_treebeast"][0], self.positions["gild_treebeast"][1]
+        # )
+        # time.sleep(1)
+        # pyautogui.keyUp("q")
+        # pyautogui.click(
+        #     self.positions["gild_close"][0], self.positions["gild_close"][1]
+        # )
 
         # Hire relevant heroes
         hire_all_relevant_heroes()
@@ -209,7 +215,7 @@ class Main(object):
                     if not self.farm_mode and r == 255:
                         if hire_last_hero_cooldown <= 0:
                             print(
-                                "Progress stoped. Hiring last hero and assigning auto-clickers"
+                                "Progress stopped. Hiring last hero and assigning auto-clickers"
                             )
                             reset_auto_clickers()
                             time.sleep(1)
@@ -218,12 +224,10 @@ class Main(object):
                             set_auto_clicker_hire_hero(
                                 self.positions["hero_last_hireable"]
                             )
+                            self.hire_last_hero_cooldown_mark = time.time()
                             time.sleep(1)
                         else:
-                            print(
-                                "Farm mode enabled, waiting %is to disable"
-                                % FARM_PERIOD_VALUE
-                            )
+                            print(f"Farm mode enabled, waiting {FARM_PERIOD_VALUE} to disable.")
                             self.farm_mode = True
                             if (
                                 cooldown_mark - self.farm_period_mark
@@ -235,7 +239,7 @@ class Main(object):
                                     )
                                     self.ascend()
                                 print(
-                                    "Progress stoped. Interval of {:.2f}s. Count: {}. {} consecutive fails remaining to ascend".format(
+                                    "Progress stopped. Interval of {:.2f}s. Count: {}. {} consecutive fails remaining to ascend".format(
                                         cooldown_mark - self.farm_period_mark,
                                         self.boss_fight_fails,
                                         BOSS_FIGHT_FAILS_LIMIT - self.boss_fight_fails,

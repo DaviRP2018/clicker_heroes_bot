@@ -6,7 +6,7 @@ import keyboard
 import pyautogui
 
 from settings.constants import KEYS_POSITIONS
-from settings.settings import NUMBER_OF_AUTO_CLICKERS, RELEVANT_HEROES_POS_WITH_SCROLLS
+from settings.settings import NUMBER_OF_AUTO_CLICKERS
 
 
 def manual_calibrate_colors():
@@ -208,13 +208,43 @@ def upgrade_all():
 
 
 def hire_all_relevant_heroes():
+    with open("settings/positions.json") as json_file:
+        positions = json.load(json_file)
+    relevant_heroes_pos_with_scrolls = [
+        positions["hero_cid"],
+        positions["hero_treebeast"],
+        positions["hero_ivan"],
+        positions["hero_brittany"],
+        positions["hero_fisherman"],
+        positions["hero_betty"],
+        positions["hero_samurai"],
+        positions["hero_leon"],
+        positions["hero_seer"],
+        positions["hero_alexa"],
+        positions["hero_natalia"],
+        positions["hero_mercedes"],
+        positions["hero_bobby"],
+        positions["hero_broyle"],
+        positions["hero_george"],
+        positions["hero_midas"],
+        positions["hero_referigerator"],
+        positions["hero_abaddon"],
+        positions["hero_mazhu"],
+        positions["hero_amenhotep"],
+        positions["hero_beastlord"],
+        positions["hero_athena"],
+        positions["hero_aphrodite"],
+        positions["hero_shinatobe"],
+        positions["hero_grant"],
+        positions["hero_frostleaf"],
+    ]
     scroll_hero_up_maximum()
     time.sleep(1 / 2)
     # change to hire MAX
-    for i in range(0, 5):
+    for i in range(0, 4):
         pyautogui.press("t")
         time.sleep(1 / 2)
-    for item in RELEVANT_HEROES_POS_WITH_SCROLLS:
+    for item in relevant_heroes_pos_with_scrolls:
         if isinstance(item, int):
             for i in range(0, item):
                 scroll_hero_down()
@@ -240,7 +270,7 @@ def set_auto_clickers_to_damage():
     with open("settings/positions.json") as json_file:
         positions = json.load(json_file)
         for i in range(1, NUMBER_OF_AUTO_CLICKERS):
-            pyautogui.click(positions["gold_pickup"][1], positions["gold_pickup"][3])
+            pyautogui.click(positions["gold_pickup"][2], positions["gold_pickup"][0])
             time.sleep(1)
     pyautogui.keyUp("c")
 
