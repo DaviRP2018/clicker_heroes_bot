@@ -10,52 +10,35 @@ from settings.constants import KEYS_POSITIONS
 from settings.settings import NUMBER_OF_AUTO_CLICKERS
 
 
-def manual_calibrate_colors():
-    """Calibrate colors"""
-    print("Press Ctrl-C to quit.")
-    dc = windll.user32.GetDC(0)
-    try:
-        while True:
-            x, y = pyautogui.position()
-            rgb = windll.gdi32.GetPixel(dc, x, y)
-            r = rgb & 0xFF
-            g = (rgb >> 8) & 0xFF
-            b = (rgb >> 16) & 0xFF
-            color = "{} {} {}".format(r, g, b)
-            print(color, end="")
-            print("\b" * len(color), end="", flush=True)
-    except KeyboardInterrupt:
-        return
-
-
-def manual_calibrate_positions():
-    """Calibrate positions"""
-    print("Press Ctrl-C to quit.")
-    try:
-        while True:
-            x, y = pyautogui.position()
-            position_str = "X: " + str(x).rjust(4) + " Y: " + str(y).rjust(4)
-            print(position_str, end="")
-            print("\b" * len(position_str), end="", flush=True)
-    except KeyboardInterrupt:
-        return
+def configure():
+    input(
+        "This set up will guide you trhought settings required for"
+        " the bot to work, the bot works by using your mouse and"
+        " clicking on the screen where stuff is. So you need"
+        " to have CLicker Heroes opened and in your latest zone"
+        " possible. [Press Enter]"
+    )
+    calibrate_colors()
+    calibrate_positions()
 
 
 def calibrate_colors():
     """Calibrate colors"""
-    with open("settings/colors_template.json") as json_file:
-        colors = json.load(json_file)
-    with open("settings/colors.json", "w") as json_file:
-        json_file.truncate()
+    with open("settings/colors_template.json") as color_template_file:
+        colors = json.load(color_template_file)
+    with open("settings/colors.json", "w") as color_file:
+        color_file.truncate()
         print("Press Ctrl-C to quit.")
         print("")
+        print(colors["hero_buy_all_upgrades"]["help"])
         print("Press 'F' to pick the color.")
+
         progress = 0
         finish = 1
         dc = windll.user32.GetDC(0)
         try:
             x, y = pyautogui.position()
-            colors["hero_buy_all_upgrades"].append(y)
+            colors["hero_buy_all_upgrades"]["values"].append(y)
             while progress < finish:
                 if keyboard.is_pressed("f"):  # if key 'f' is pressed
                     x, y = pyautogui.position()
@@ -66,13 +49,13 @@ def calibrate_colors():
                     colors["hero_buy_all_upgrades"] = (r, g, b)
                     progress += 1
                     print(
-                        "hero_buy_all_upgrades",
+                        "Picked color for hero_buy_all_upgrades",
                         colors["hero_buy_all_upgrades"],
                     )
                     time.sleep(1)
         except KeyboardInterrupt:
             pass
-        json.dump(colors, json_file)
+        json.dump(colors, color_file)
         print("Saved")
 
 
@@ -170,9 +153,7 @@ def scroll_hero_down_maximum():
 def scroll_hero_down():
     with open("settings/positions.json") as json_file:
         positions = json.load(json_file)
-        pyautogui.click(
-            positions["scroll_hero_down"][0], positions["scroll_hero_down"][1]
-        )
+        pyautogui.click(positions["scroll_hero_down"][0], positions["scroll_hero_down"][1])
 
 
 def get_color(x, y):
@@ -264,9 +245,7 @@ def reset_auto_clickers():
     time.sleep(1 / 2)
     with open("settings/positions.json") as json_file:
         positions = json.load(json_file)
-        pyautogui.click(
-            positions["auto_clicker"][0], positions["auto_clicker"][1]
-        )
+        pyautogui.click(positions["auto_clicker"][0], positions["auto_clicker"][1])
     time.sleep(1 / 2)
     pyautogui.keyDown("c")
 
@@ -276,9 +255,7 @@ def set_auto_clickers_to_damage():
     with open("settings/positions.json") as json_file:
         positions = json.load(json_file)
         for _ in range(1, NUMBER_OF_AUTO_CLICKERS):
-            pyautogui.click(
-                positions["gold_pickup"][2], positions["gold_pickup"][0]
-            )
+            pyautogui.click(positions["gold_pickup"][2], positions["gold_pickup"][0])
             time.sleep(1)
     pyautogui.keyUp("c")
 

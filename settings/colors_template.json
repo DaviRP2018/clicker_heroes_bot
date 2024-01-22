@@ -1,3 +1,7 @@
 {
-  "hero_buy_all_upgrades": []
+  "hero_buy_all_upgrades": {
+    "description":  "",
+    "help": "We are picking the color of the 'Buy Available Upgrades'. Try to pick the green part of it. This button shows up after some progress and it's always at the bottom of the hero list.",
+    "values": []
+  }
 }

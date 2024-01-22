@@ -1,7 +1,8 @@
 import sys
 
 from bot.main import Main
-from utils.utils import calibrate_colors, calibrate_positions, manual_calibrate_colors, manual_calibrate_positions
+from utils.manual_utils import manual_calibrate_colors, manual_calibrate_positions
+from utils.utils import calibrate_colors, calibrate_positions, configure
 
 
 class ManagementUtility:
@@ -24,6 +25,8 @@ class ManagementUtility:
         if subcommand == "runbot":
             bot = Main()
             bot.start_bot()
+        elif subcommand == "configure":
+            configure()
         elif subcommand == "calibratecolors":
             calibrate_colors()
         elif subcommand == "calibratepositions":
