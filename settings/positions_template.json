@@ -1,5 +1,5 @@
 {
-  "gold_pickup": {"description": "", "help": "", "values":  []},
+  "gold_pickup": {"description": "", "help": "Defining gold pickup positions, we are going to set 3 mouse positions where we want to collect gold. This means, we should choose the location the gold drop. We choose 3 positions because 1 is not enough, so create a 3 point 'line' bellow monsters", "values":  []},
   "powers": {"description": "", "help": "", "values":  []},
   "auto_clicker": {"description": "", "help": "", "values":  []},
   "farm_mode": {"description": "", "help": "", "values":  []},

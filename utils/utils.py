@@ -60,7 +60,7 @@ def calibrate_colors():
 
 
 def calibrate_gold_pickup(positions):
-    print("Defining gold pickup, 3 positions required.")
+    print(positions["gold_pickup"]["help"])
     progress = 0
     finish = 3
     try:
