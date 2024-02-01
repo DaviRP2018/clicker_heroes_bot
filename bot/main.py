@@ -22,6 +22,7 @@ from utils.utils import (
     upgrade_all,
 )
 
+
 POWERS = Powers.powers
 
 
@@ -80,7 +81,8 @@ class Main(object):
             ) and energize_cooldown <= 0:
                 print("Using Energize on", power_name)
                 pyautogui.click(
-                    x=self.positions["powers"][0], y=self.positions["powers"][8]
+                    x=self.positions["powers"][0],
+                    y=self.positions["powers"][8],
                 )  # Energize
                 POWERS[8]["cooldown_mark"] = time.time()
                 POWERS[power_id]["is_powered"] = True
@@ -91,18 +93,21 @@ class Main(object):
             if not is_infinite and reload_cooldown <= 0:
                 print("Using Reload on", power_name)
                 pyautogui.click(
-                    x=self.positions["powers"][0], y=self.positions["powers"][9]
+                    x=self.positions["powers"][0],
+                    y=self.positions["powers"][9],
                 )  # Reload
                 POWERS[9]["cooldown_mark"] = time.time()
                 POWERS[power_id]["cooldown_mark"] = time.time()
-                POWERS[power_id]["cooldown_value"] = POWERS[power_id]["duration"]
+                POWERS[power_id]["cooldown_value"] = POWERS[power_id][
+                    "duration"
+                ]
             else:
                 POWERS[power_id]["cooldown_mark"] = time.time()
                 POWERS[power_id]["cooldown_value"] = POWERS[power_id][
                     "cooldown_initial"
                 ]
 
-    def output_cooldowns(self):
+    def output_cooldown(self):
         print(
             """
                 {}: {}
@@ -139,19 +144,24 @@ class Main(object):
     def pickup_gold(self):
         for i in range(1, 4):
             pyautogui.moveTo(
-                self.positions["gold_pickup"][i], self.positions["gold_pickup"][0]
+                self.positions["gold_pickup"][i],
+                self.positions["gold_pickup"][0],
             )
             time.sleep(GOLD_PICKUP_INTERVAL / 1000)
 
     def ascend(self):
-        pyautogui.click(self.positions["ascension"][0], self.positions["ascension"][1])
+        pyautogui.click(
+            self.positions["ascension"][0], self.positions["ascension"][1]
+        )
         time.sleep(1)
         pyautogui.click(
             self.positions["ascension_yes_button"][0],
             self.positions["ascension_yes_button"][1],
         )
         time.sleep(3)
-        pyautogui.click(self.positions["farm_mode"][0], self.positions["farm_mode"][1])
+        pyautogui.click(
+            self.positions["farm_mode"][0], self.positions["farm_mode"][1]
+        )
         time.sleep(1)
 
         pyautogui.click(
@@ -161,12 +171,17 @@ class Main(object):
         time.sleep(3)
 
         # Get new gilds and gild Treebeast
-        pyautogui.click(self.positions["gild_new"][0], self.positions["gild_new"][1])
-        time.sleep(2)
-        pyautogui.click(self.positions["gild_new"][0], self.positions["gild_new"][1])
+        pyautogui.click(
+            self.positions["gild_new"][0], self.positions["gild_new"][1]
+        )
         time.sleep(2)
         pyautogui.click(
-            self.positions["gild_new_openall"][0], self.positions["gild_new_openall"][1]
+            self.positions["gild_new"][0], self.positions["gild_new"][1]
+        )
+        time.sleep(2)
+        pyautogui.click(
+            self.positions["gild_new_openall"][0],
+            self.positions["gild_new_openall"][1],
         )
         time.sleep(2)
         # pyautogui.keyDown("q")
@@ -209,7 +224,8 @@ class Main(object):
                         cooldown_mark - self.hire_last_hero_cooldown_mark
                     )
                     rgb = get_color(
-                        self.positions["farm_mode"][0], self.positions["farm_mode"][1]
+                        self.positions["farm_mode"][0],
+                        self.positions["farm_mode"][1],
                     )
                     r = rgb[0]
                     if not self.farm_mode and r == 255:
@@ -227,22 +243,29 @@ class Main(object):
                             self.hire_last_hero_cooldown_mark = time.time()
                             time.sleep(1)
                         else:
-                            print(f"Farm mode enabled, waiting {FARM_PERIOD_VALUE} to disable.")
+                            print(
+                                f"Farm mode enabled, waiting {FARM_PERIOD_VALUE} to disable."
+                            )
                             self.farm_mode = True
                             if (
                                 cooldown_mark - self.farm_period_mark
                             ) <= BOSS_FIGHT_FAIL_INTERVAL:
                                 self.boss_fight_fails += 1
-                                if self.boss_fight_fails >= BOSS_FIGHT_FAILS_LIMIT:
+                                if (
+                                    self.boss_fight_fails
+                                    >= BOSS_FIGHT_FAILS_LIMIT
+                                ):
                                     print(
                                         "Progress is not possible. Preparing to ascend"
                                     )
                                     self.ascend()
                                 print(
-                                    "Progress stopped. Interval of {:.2f}s. Count: {}. {} consecutive fails remaining to ascend".format(
+                                    "Progress stopped. Interval of {:.2f}s. Count: {}."
+                                    " {} consecutive fails remaining to ascend".format(
                                         cooldown_mark - self.farm_period_mark,
                                         self.boss_fight_fails,
-                                        BOSS_FIGHT_FAILS_LIMIT - self.boss_fight_fails,
+                                        BOSS_FIGHT_FAILS_LIMIT
+                                        - self.boss_fight_fails,
                                     )
                                 )
                                 print("Upgrading all heroes")
@@ -258,15 +281,17 @@ class Main(object):
                         )
                         self.farm_mode = False
 
-                    try:  # used try so that if user pressed other than the given key error will not be shown
+                    try:
+                        # used try so that if user pressed other than the
+                        # given key error will not be shown
                         if keyboard.is_pressed("p"):  # if key 'p' is pressed
                             print("Bot stopped, press R to resume")
                             break  # finishing the loop
                         elif keyboard.is_pressed("i"):
-                            self.output_cooldowns()
+                            self.output_cooldown()
                         else:
                             pass
-                    except:
+                    except Exception:
                         pass  # if user pressed other than the given key the loop will break
 
                     self.pickup_gold()
@@ -277,18 +302,18 @@ class Main(object):
                     self.powersurge_cooldown = POWERS[2]["cooldown_value"] - (
                         cooldown_mark - POWERS[2]["cooldown_mark"]
                     )
-                    self.lucky_strikes_cooldown = POWERS[3]["cooldown_value"] - (
-                        cooldown_mark - POWERS[3]["cooldown_mark"]
-                    )
-                    self.metal_detector_cooldown = POWERS[4]["cooldown_value"] - (
-                        cooldown_mark - POWERS[4]["cooldown_mark"]
-                    )
-                    self.golden_clicks_cooldown = POWERS[5]["cooldown_value"] - (
-                        cooldown_mark - POWERS[5]["cooldown_mark"]
-                    )
-                    self.super_clicks_cooldown = POWERS[6]["cooldown_value"] - (
-                        cooldown_mark - POWERS[6]["cooldown_mark"]
-                    )
+                    self.lucky_strikes_cooldown = POWERS[3][
+                        "cooldown_value"
+                    ] - (cooldown_mark - POWERS[3]["cooldown_mark"])
+                    self.metal_detector_cooldown = POWERS[4][
+                        "cooldown_value"
+                    ] - (cooldown_mark - POWERS[4]["cooldown_mark"])
+                    self.golden_clicks_cooldown = POWERS[5][
+                        "cooldown_value"
+                    ] - (cooldown_mark - POWERS[5]["cooldown_mark"])
+                    self.super_clicks_cooldown = POWERS[6][
+                        "cooldown_value"
+                    ] - (cooldown_mark - POWERS[6]["cooldown_mark"])
                     self.dark_ritual_cooldown = POWERS[7]["cooldown_value"] - (
                         cooldown_mark - POWERS[7]["cooldown_mark"]
                     )
@@ -336,7 +361,10 @@ class Main(object):
                         self.reload_cooldown,
                     )
 
-                    if self.dark_ritual_cooldown <= 0 and self.reload_cooldown <= 0:
+                    if (
+                        self.dark_ritual_cooldown <= 0
+                        and self.reload_cooldown <= 0
+                    ):
                         time.sleep(
                             5
                         )  # Garante que o poder esteja carregado por conta do lag no jogo

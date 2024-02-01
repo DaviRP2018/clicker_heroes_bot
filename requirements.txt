@@ -1,3 +1,5 @@
-keyboard~=0.13.4
-PyAutoGUI~=0.9.48
-pymongo~=4.6.1
+pre-commit
+
+
+keyboard~=0.13.5
+PyAutoGUI~=0.9.54

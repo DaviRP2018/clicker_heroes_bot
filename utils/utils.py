@@ -12,10 +12,10 @@ from settings.settings import NUMBER_OF_AUTO_CLICKERS
 
 def configure():
     input(
-        "This set up will guide you trhought settings required for"
+        "This set up will guide you through settings required for"
         " the bot to work, the bot works by using your mouse and"
         " clicking on the screen where stuff is. So you need"
-        " to have CLicker Heroes opened and in your latest zone"
+        " to have Clicker Heroes opened and in your latest zone"
         " possible. [Press Enter]"
     )
     calibrate_colors()
@@ -153,7 +153,9 @@ def scroll_hero_down_maximum():
 def scroll_hero_down():
     with open("settings/positions.json") as json_file:
         positions = json.load(json_file)
-        pyautogui.click(positions["scroll_hero_down"][0], positions["scroll_hero_down"][1])
+        pyautogui.click(
+            positions["scroll_hero_down"][0], positions["scroll_hero_down"][1]
+        )
 
 
 def get_color(x, y):
@@ -245,7 +247,9 @@ def reset_auto_clickers():
     time.sleep(1 / 2)
     with open("settings/positions.json") as json_file:
         positions = json.load(json_file)
-        pyautogui.click(positions["auto_clicker"][0], positions["auto_clicker"][1])
+        pyautogui.click(
+            positions["auto_clicker"][0], positions["auto_clicker"][1]
+        )
     time.sleep(1 / 2)
     pyautogui.keyDown("c")
 
@@ -255,7 +259,9 @@ def set_auto_clickers_to_damage():
     with open("settings/positions.json") as json_file:
         positions = json.load(json_file)
         for _ in range(1, NUMBER_OF_AUTO_CLICKERS):
-            pyautogui.click(positions["gold_pickup"][2], positions["gold_pickup"][0])
+            pyautogui.click(
+                positions["gold_pickup"][2], positions["gold_pickup"][0]
+            )
             time.sleep(1)
     pyautogui.keyUp("c")
 
